@@ -1,0 +1,17 @@
+GET  http://localhost:3002/user/get-cart
+Authorization: eyJhbGciOiJIUzI1NiJ9.NWY0ZGQ3YjUwMzZhNTczNjJiZjJlNTBi.NVu2gXaeLfO_KdR5WTVGVZMPx7U_9GRG2H6-m4MG32I
+type: EMP
+
+###
+POST  http://localhost:3002/user/add-to-cart
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiJ9.NWY0ZGQ3YjUwMzZhNTczNjJiZjJlNTBi.NVu2gXaeLfO_KdR5WTVGVZMPx7U_9GRG2H6-m4MG32I
+type: EMP
+
+{
+    "cartItem" : {
+        "productID": "5f4914a408e5a314a1175533",
+        "quantity": 2,
+        "price" : 5600
+    }
+}
