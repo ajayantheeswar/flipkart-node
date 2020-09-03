@@ -153,7 +153,7 @@ exports.getOrders = async (req,res,next) => {
     try {
         const userID = req.user.id;
         const orders = await Order.find({
-            userID : mongoose.Schema.Types.ObjectId(userID)
+            userID : mongoose.Types.ObjectId(userID)
         })
         res.status(200).json({Status : 'Success' , orders : orders})
     }catch(err) {
@@ -197,4 +197,22 @@ exports.postOrder = async (req,res,next) => {
     }
 }
 
-//5f4914a408e5a314a1175533
+exports.cancelOrder = async (req,res,next) => {
+    try{    
+        const {orderID} = req.body;
+        const order = await Order.findById(mongoose.Types.ObjectId(orderID))
+        order.delivery.status = "CANCELLED";
+        await order.save();
+
+        const userID = req.user.id;
+        const orders = await Order.find({
+            userID : mongoose.Types.ObjectId(userID)
+        })
+        res.status(200).json({Status : 'Success' , orders : orders})
+    }catch (error) {
+        res.status(404).json({"Status" : "Orders Cancel Failed" , error : err.message})
+    }
+}
+
+
+//

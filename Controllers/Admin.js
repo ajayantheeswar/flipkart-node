@@ -1,7 +1,8 @@
 const { Database } = require('../Database/mongoose');
 const {ProductModel} = require('../Models/Product');
 const {bucket} = require('../firebase');
-
+const Order =  require('../Models/Order');
+const mongoose = require('mongoose')
 
 
 const http = require('http');
@@ -69,3 +70,31 @@ const imageUpload = async (file) => new Promise( (resolve,reject) => {
     
 
 } ) 
+
+exports.deliverOrder = async (req,res,next) => {
+    try{
+        const {orderID} = req.body;
+        const order = await Order.findById(mongoose.Types.ObjectId(orderID))
+        order.delivery.status = "DELIVERED";
+        order.delivery.date = new Date().getTime().toString()
+        await order.save();
+
+        const orders = await Order.find()
+
+
+        res.status(200).json({"Status" : "Order Delivered" , orders : orders})
+    }catch(err){
+        res.status(404).json({"Status" : "Orders Cancel Failed" , error : err.message})
+    }
+}
+
+exports.getOrders = async (req,res,next) => {
+    try{
+        const {orderID} = req.body;
+        const orders = await Order.find()
+
+        res.status(200).json({"Status" : "Order Fetched" , orders : orders})
+    }catch(err){
+        res.status(404).json({"Status" : "Orders Cancel Failed" , error : err.message})
+    }
+}

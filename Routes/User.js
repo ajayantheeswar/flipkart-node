@@ -15,10 +15,10 @@ router.post('/dec-cart/:productID',userController.decCart);
 
 // Orders - Routes
 
-router.get('/get-orders');
+router.get('/get-orders',userController.getOrders);
 router.post('/post-order',userController.postOrder);
 
-router.post('/cancel-order');
+router.post('/cancel-order',userController.cancelOrder);
 
 
 

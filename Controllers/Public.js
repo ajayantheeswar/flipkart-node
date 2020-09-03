@@ -23,3 +23,11 @@ exports.getProduct = async (req,res,next) => {
         res.status(400).json({Message : "Fail" , err : err.message});
     }
 }
+
+exports.getProductsByCatagory = async (req,res,next) => {
+    try {
+        const productID = mongoose.Types.ObjectId(req.params.productID);
+    }catch(err) {
+        res.status(400).json({})
+    }
+}

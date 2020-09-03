@@ -7,7 +7,7 @@ const upload = multer();
 
 router.post('/add-product',upload.array('imageFiles'),AdminController.addProduct);
 
-
-router.post('/deliver-order')
+router.get('/get-orders',AdminController.getOrders)
+router.post('/deliver-order',AdminController.deliverOrder)
 
 exports.router = router;
