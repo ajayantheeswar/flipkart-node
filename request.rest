@@ -15,3 +15,9 @@ type: EMP
         "price" : 5600
     }
 }
+
+###
+GET http://localhost:3002/public/get-catagory?catagoryName=Mobiles&sortBy=LH
+
+###
+GET http://localhost:3002/public/search?search=s&sortBy=LH

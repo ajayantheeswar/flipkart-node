@@ -34,6 +34,7 @@ exports.addProduct = async (req,res,next) => {
             techincalSpecification : techSpec 
         });
         await product.save();
+        
         res.json({Message : "Success", product : product.get('productName') })
     }
     catch(err) {
