@@ -9,4 +9,6 @@ router.post('/user/signup',Auth.signUpUser);
 router.post('/admin/signup',Auth.signUpAdminUser);
 router.post('/admin/signin',Auth.signInAdminUser);
 
+router.post('/verify-otp',Auth.verifyUserOTP)
+
 exports.router = router;

@@ -27,8 +27,16 @@ const userSchema = new Schema({
         totalPrice : Number
     
     },
-    authType : String
-    
+    authType : String,
+    twoFactorAuthentication : {
+        type : Boolean,
+        default : true
+    },
+    OTP : {
+        code : Number,
+        exp : Number,
+        attempt : Number
+    }
 });
 
 module.exports = mongoose.model('User',userSchema)
