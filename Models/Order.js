@@ -19,7 +19,8 @@ const orderSchema = new Schema({
         deliveryDate : String
     },
     amount : Number,
-    deliveryMode : String
+    deliveryMode : String,
+    paymentDetails : Object
 });
 
 module.exports = mongoose.model('Order',orderSchema)

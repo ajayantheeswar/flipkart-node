@@ -28,6 +28,12 @@ const productSchema = new Schema({
             value : String
         }]
     }],
+    reviews : [{
+        userName : String,
+        title : String,
+        content : String,
+        rating : String
+    }]
 });
 
 module.exports.ProductModel = mongoose.model('Product',productSchema)

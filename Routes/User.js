@@ -18,6 +18,8 @@ router.post('/dec-cart/:productID',userController.decCart);
 router.get('/get-orders',userController.getOrders);
 router.post('/post-order',userController.postOrder);
 
+router.post('/create-razor-order' ,userController.createOrderRazorPay)
+
 router.post('/cancel-order',userController.cancelOrder);
 
 

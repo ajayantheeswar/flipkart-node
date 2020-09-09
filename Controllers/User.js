@@ -3,6 +3,9 @@ const { Database } = require('../Database/mongoose');
 const Order = require('../Models/Order');
 const mongoose = require('mongoose');
 
+const {razorPayInstance} = require('../razorPay');
+const { v4 : uuidv4 } =require ('uuid');
+
 const cartPopulateOption = {
     path : 'cart.items',
     populate : {
@@ -54,7 +57,7 @@ exports.addToCart = async(req,res,next) => {
         console.log(updatedCartItemIndex);
         if(updatedCartItemIndex >= 0){
             cart.items[updatedCartItemIndex].quantity += 1 ;
-            cart.items[updatedCartItemIndex].subTotal = cart.items[updatedCartItemIndex].quantity * icart.items[updatedCartItemIndex].price
+            cart.items[updatedCartItemIndex].subTotal = cart.items[updatedCartItemIndex].quantity * cart.items[updatedCartItemIndex].price
         }else{
             item.subTotal = item.quantity * item.price
             cart.items = [...user.cart.items,item];
@@ -164,26 +167,29 @@ exports.getOrders = async (req,res,next) => {
 exports.postOrder = async (req,res,next) => {
     try {
         const userID = req.user.id;
-        const {address ,phone , deliveryMode } = req.body;
+        const {deliveryDetails , paymentDetails} = req.body;
+        const {address ,phone , deliveryMode } = deliveryDetails;
 
         await req.user.populate().execPopulate(cartPopulateOptionForOrder)
 
         const cart = req.user.cart;
-        
+
         const delivery = {
             address : address,
             phone : phone,
             status : "APPROVED",
             deliveryDate : ''
         }
+
         const amount = cart.totalPrice;
         const products = cart.items;
-        const order = new Order({
+        let order = new Order({
             userID : userID,
             products : products,
             delivery :delivery,
             amount :amount,
-            deliveryMode : deliveryMode
+            deliveryMode : deliveryMode,
+            paymentDetails : paymentDetails
         });
 
         cart.items = [];
@@ -191,9 +197,21 @@ exports.postOrder = async (req,res,next) => {
         await order.save();
         await req.user.save();
 
-        res.status(200).json({Status : 'Success' , order : order})
+        res.status(200).json({Status : 'Success' , order : order, mode : deliveryMode})
     }catch(err) {
         res.status(404).json({"Status" : "Orders Fetch Failed" , error : err.message})
+    }
+}
+
+exports.createOrderRazorPay = async (req,res,next) => {
+    try{
+        const cart = req.user.cart;
+        const amount = cart.totalPrice;
+       
+        const razorOrder =  await razorPayInstance.orders.create({amount : amount * 100, currency : 'INR', receipt : uuidv4() , payment_capture : true})
+        res.status(200).json({Status : 'Success' ,razorOrder , mode : 'RAZOR_PAY'})    
+    }catch(err) {
+        res.status(404).json({"Status" : "Payment Creation  Failed" , error : err.message})
     }
 }
 
@@ -201,6 +219,15 @@ exports.cancelOrder = async (req,res,next) => {
     try{    
         const {orderID} = req.body;
         const order = await Order.findById(mongoose.Types.ObjectId(orderID))
+
+        if (order.deliveryMode !== 'Cash on Delivery') {
+            const refund = await razorPayInstance.payments.refund(order.paymentDetails.razorpay_payment_id)
+            order.paymentDetails = {
+                ...order.paymentDetails,
+                refund : refund
+            }
+        }
+
         order.delivery.status = "CANCELLED";
         await order.save();
 
@@ -210,9 +237,7 @@ exports.cancelOrder = async (req,res,next) => {
         })
         res.status(200).json({Status : 'Success' , orders : orders})
     }catch (error) {
-        res.status(404).json({"Status" : "Orders Cancel Failed" , error : err.message})
+        res.status(404).json({"Status" : "Orders Cancel Failed" , error : error.message})
     }
 }
 
-
-//
